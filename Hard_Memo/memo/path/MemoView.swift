@@ -8,7 +8,10 @@ import SwiftUI
 
 struct MemoView: View {
     @State private var location: [[CGPoint]] = []
+    @State private var currentlocation: [CGPoint] = []
     @State private var lastIndex = 0
+    
+    @State private var mode = 0
     
     var body: some View {
         GeometryReader { geometry in
@@ -38,25 +41,57 @@ struct MemoView: View {
                 DragGesture(minimumDistance: 0)
                     .onChanged { value in
                         // 터치 중인 좌표를 계속 추가
-                        if (location.count - 1) < lastIndex {
-                            location.append([])
+                        
+                        if mode == 0 {
+                            currentlocation.append(value.location)
+                        } else if mode == 1 {
+                            let radius: CGFloat = 10
+                            var newPaths: [[CGPoint]] = []
+                            for path in location {
+                                var currentSegment: [CGPoint] = []
+                                for point in path {
+                                    let distance = hypot(point.x - value.location.x, point.y - value.location.y)
+                                    if distance > radius {
+                                        currentSegment.append(point)
+                                    } else {
+                                        if currentSegment.count >= 2 {
+                                            newPaths.append(currentSegment)
+                                        }
+                                        currentSegment = []
+                                    }
+                                }
+                                if currentSegment.count >= 2 {
+                                    newPaths.append(currentSegment)
+                                }
+                            }
+                            location = newPaths
                         }
-                        location[self.lastIndex].append(value.location)
                     }
                     .onEnded { _ in
+                        if mode != 1 {
+                            location.append(currentlocation)
+                            currentlocation = []
+                        }
                         lastIndex += 1
                         print("Drawing ended with \(location.count) points")
                     }
             )
             .overlay(alignment: .bottom) {
                 Button {
-                    if location.count > 0 {
-                        location.popLast()
-                        lastIndex -= 1
+                    if mode == 0 {
+                        mode = 1
+                    } else if mode == 1 {
+                        mode = 0
                     }
                 } label: {
-                    Text("지우개")
-                        .foregroundStyle(.green)
+                    
+                        if mode == 0 {
+                            Text("지우개")
+                                .foregroundStyle(.green)
+                        } else if mode == 1 {
+                            Text("펜")
+                                .foregroundStyle(.green)
+                        }
                 }
             }
         }

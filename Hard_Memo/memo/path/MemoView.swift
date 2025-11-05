@@ -6,6 +6,7 @@
 //
 import SwiftUI
 import Foundation
+import CoreGraphics
 
 struct MemoView: View {
     @State private var location: [[CGPoint]] = []
@@ -62,22 +63,21 @@ struct MemoView: View {
                     let rx = shape.points[0].x - midPoint.x
                     let ry = shape.points[0].y - midPoint.y
                     let r = sqrt( (rx * rx) + (ry * ry))
-                        Path { path in
-                            path.move(to: startPoint)
-
-                                   // 원하는 각도만큼 점 찍으면서 이어 그리기
-                            for index in 24..<60 {
-                                let degree = Double(index) * 10   // 240°, 250°, ... 이런 식
-                                let p = point(onCircleWith: midPoint,
-                                              radius: r,
-                                              degree: degree)
-                                path.addLine(to: p)
-                            }
+                    Path { path in
+                        path.move(to: startPoint)
+                        
+                        for index in 24..<60 {
+                            let degree = Double(index) * 10
+                            let p = point(onCircleWith: midPoint,
+                                          radius: r,
+                                          degree: degree)
+                            path.addLine(to: p)
                         }
-                        .stroke(Color.blue, lineWidth: 1)
-                        .frame(width: width, height: height)
-                        .background(.white.opacity(0.001))
-                        //                        path.addEllipse(in: CGRect(origin: shape.points[0], size: CGSize(width: (shape.points.last?.x ?? 0) - shape.points[0].x, height: (shape.points.last?.y ?? 0) - shape.points[0].y)))
+                    }
+                    .stroke(Color.blue, lineWidth: 1)
+                    .frame(width: width, height: height)
+                    .background(.white.opacity(0.001))
+                    //                        path.addEllipse(in: CGRect(origin: shape.points[0], size: CGSize(width: (shape.points.last?.x ?? 0) - shape.points[0].x, height: (shape.points.last?.y ?? 0) - shape.points[0].y)))
                 }
             }
             .frame(width: width, height: height)
@@ -143,32 +143,33 @@ struct MemoView: View {
                     }
                 } label: {
                     if mode == 0 {
-                        Text("지우개")
+                        Text("펜")
                             .foregroundStyle(.green)
                     } else if mode == 1 {
-                        Text("펜")
+                        Text("지우개")
                             .foregroundStyle(.green)
                     } else if mode == 2 {
                         Text("도형")
                             .foregroundStyle(.green)
                     }
                 }
-                
-                //                Menu("도형 선택") {
-                //                    Button {
-                //                        shpaeType = .rectangle
-                //                    } label: {
-                //                        Text("정사각형")
-                //                            .foregroundStyle(.green)
-                //                    }
-                //
-                //                    Button {
-                //                        shpaeType = .circle
-                //                    } label: {
-                //                        Text("원")
-                //                            .foregroundStyle(.green)
-                //                    }
-                //                }
+            }
+            .overlay(alignment: .bottomTrailing) {
+                Menu("도형 선택") {
+                    Button {
+                        shpaeType = .rectangle
+                    } label: {
+                        Text("정사각형")
+                            .foregroundStyle(.green)
+                    }
+                    
+                    Button {
+                        shpaeType = .circle
+                    } label: {
+                        Text("원")
+                            .foregroundStyle(.green)
+                    }
+                }
             }
         }
     }

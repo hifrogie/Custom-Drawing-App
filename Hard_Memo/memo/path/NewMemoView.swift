@@ -8,15 +8,13 @@ import SwiftUI
 import Foundation
 import CoreGraphics
 
-struct MemoView: View {
+struct NewMemoView: View {
     @State private var location: [[CGPoint]] = []
     @State private var currentlocation: [CGPoint] = []
-    @State private var rectLocation: [ShapeData] = []
-    @State private var circleLocation: [ShapeData] = []
-    
+    @State private var shapeLocation: [CGPoint] = []
     @State private var mode = 0
-    @State private var shape: ShapeData?
     @State private var shpaeType: Shape = .circle
+    
     var body: some View {
         GeometryReader { geometry in
             let width = geometry.size.width
@@ -37,47 +35,6 @@ struct MemoView: View {
                     .stroke(Color.blue, lineWidth: 6)
                     .frame(width: width, height: height)
                     .background(.white.opacity(0.001))
-                }
-                
-                ForEach(0..<rectLocation.count, id: \.self) { i in
-                    Path { path in
-                        let shape = rectLocation[i]
-                        path.move(to: shape.points[0])
-                        //                        path.addRect(CGRect(origin: shape.points[0], size: CGSize(width: (shape.points.last?.x ?? 0) - shape.points[0].x, height: (shape.points.last?.y ?? 0) - shape.points[0].y)))
-                        let lastP = shape.points.last ?? .zero
-                        path.addLine(to: CGPoint(x: lastP.x, y: shape.points[0].y))
-                        path.addLine(to: lastP)
-                        path.addLine(to: CGPoint(x: shape.points[0].x, y: lastP.y))
-                        path.addLine(to: shape.points[0])
-                    }
-                    .stroke(Color.blue, lineWidth: 6)
-                    .frame(width: width, height: height)
-                    .background(.white.opacity(0.001))
-                }
-                //
-                ForEach(0..<circleLocation.count, id: \.self) { i in
-                    let shape = circleLocation[i]
-                    let startPoint = shape.points[0]
-                    let lastPoint = shape.points.last ?? .zero
-                    let midPoint = CGPoint(x: (startPoint.x + lastPoint.x) / 2, y: (startPoint.y + lastPoint.y) / 2)
-                    let rx = shape.points[0].x - midPoint.x
-                    let ry = shape.points[0].y - midPoint.y
-                    let r = sqrt( (rx * rx) + (ry * ry))
-                    Path { path in
-                        path.move(to: startPoint)
-                        
-                        for index in 24...60 {
-                            let degree = Double(index) * 10
-                            let p = point(onCircleWith: midPoint,
-                                          radius: r,
-                                          degree: degree)
-                            path.addLine(to: p)
-                        }
-                    }
-                    .stroke(Color.blue, lineWidth: 1)
-                    .frame(width: width, height: height)
-                    .background(.white.opacity(0.001))
-                    //                        path.addEllipse(in: CGRect(origin: shape.points[0], size: CGSize(width: (shape.points.last?.x ?? 0) - shape.points[0].x, height: (shape.points.last?.y ?? 0) - shape.points[0].y)))
                 }
             }
             .frame(width: width, height: height)
@@ -109,26 +66,28 @@ struct MemoView: View {
                             }
                             location = newPaths
                         } else if mode == 2 {
-                            if shape == nil {
-                                shape = ShapeData(points: [value.location])
-                                return
+                            if shapeLocation.count == 0 {
+                                shapeLocation.append(value.location)
                             }
-                            shape?.points.append(value.location)
                         }
                     }
-                    .onEnded { _ in
+                    .onEnded { value in
                         if mode == 0 {
                             location.append(currentlocation)
                             currentlocation = []
-                        } else if mode == 2, let shape = self.shape {
-                            switch self.shpaeType {
-                            case .circle:
-                                circleLocation.append(shape)
-                            case .rectangle:
-                                rectLocation.append(shape)
-                            }
-                            self.shape = nil
+                        } else if mode == 2 {
+                            shapeLocation.append(value.location)
+                            makeCircle()
+                            shapeLocation = []
+                            currentlocation = []
+                        } else if mode == 3 {
+                            shapeLocation.append(value.location)
+                            makeSquare()
+                            shapeLocation = []
+                            currentlocation = []
+                            
                         }
+                        print("mode = \(mode)")
                         print("Drawing ended with \(location.count) points")
                     }
             )
@@ -174,6 +133,110 @@ struct MemoView: View {
         }
     }
     
+    func makeRect() {
+        let startPoint = shapeLocation[0]
+        let lastPoint = shapeLocation.last ?? .zero
+        let leftBottomP = CGPoint(x: startPoint.x, y: lastPoint.y)
+        let rightTopP = CGPoint(x: lastPoint.x, y: startPoint.y)
+        
+        
+    }
+    
+//    func makeRowPoints(startPoint:CGPoint, endPoint:CGPoint) -> [CGPoint] {
+//        let diffX = (endPoint.x - startPoint.x)
+//        let diffY = (endPoint.y - startPoint.y)
+//        
+//        let distance = sqrt( (diffX * diffX) + (diffY * diffY))
+//        
+//        if startPoint.x > endPoint.x {
+//            for i in Int(distance / 10) {
+//                
+//            }
+//        }
+//        
+//    }
+    func makeCircle() {
+        let startPoint = shapeLocation[0]
+        let lastPoint = shapeLocation.last ?? .zero
+        let midPoint = CGPoint(x: (startPoint.x + lastPoint.x) / 2, y: (startPoint.y + lastPoint.y) / 2)
+        let rx = startPoint.x - midPoint.x
+        let ry = startPoint.y - midPoint.y
+        let r = sqrt( (rx * rx) + (ry * ry))
+        
+        for index in 1...37 {
+                let degree = Double(index) * 10
+                let p = point(onCircleWith: midPoint,
+                              radius: r,
+                              degree: degree)
+                currentlocation.append(p)
+                
+        }
+        location.append(currentlocation)
+    }
+    
+    func makeSquare() {
+        let startPoint = shapeLocation[0]
+        let lastPoint = shapeLocation.last ?? .zero
+        let midPoint = CGPoint(x: (startPoint.x + lastPoint.x) / 2, y: (startPoint.y + lastPoint.y) / 2)
+        let rx = startPoint.x
+        let ry = startPoint.y
+        let zx = lastPoint.x
+        let zy = lastPoint.y
+        
+        let leftTop = CGPoint(x: rx, y: ry)
+        let rightTop = CGPoint(x: zx, y: zy)
+        let leftBottom = CGPoint(x: rx, y: ry)
+        let rightBottom = CGPoint(x: zx, y: zy)
+        
+        var topX = (rx - zx)/5
+        topX = rx + topX
+        var topXArray : [CGPoint] = []
+        topXArray.append(CGPoint(x: topX, y: ry))
+        topX = rx + topX + topX
+        topXArray.append(CGPoint(x: topX, y: ry))
+        topX = rx + topX + topX + topX
+        topXArray.append(CGPoint(x: topX, y: ry))
+        topX = rx + topX + topX + topX + topX
+        topXArray.append(CGPoint(x: topX, y: ry))
+        topX = rx + topX + topX + topX + topX + topX
+        topXArray.append(CGPoint(x: topX, y: ry))
+        
+        var bottomX = (rx - zx)/5
+        topX = rx + topX
+        var bottomXArray : [CGPoint] = []
+        bottomXArray.append(CGPoint(x: bottomX, y: zy))
+        bottomX = rx + bottomX + bottomX
+        bottomXArray.append(CGPoint(x: bottomX, y: zy))
+        bottomX = rx + bottomX + bottomX + bottomX
+        bottomXArray.append(CGPoint(x: bottomX, y: zy))
+        bottomX = rx + bottomX + bottomX + bottomX + bottomX
+        bottomXArray.append(CGPoint(x: bottomX, y: zy))
+        bottomX = rx + bottomX + bottomX + bottomX + bottomX + bottomX
+        bottomXArray.append(CGPoint(x: bottomX, y: zy))
+        
+//        var topline = leftTop - rightTop
+        
+//        rx, ry ( 왼쪽위 )
+//        zx, ry ( 오른쪽위 )
+//        rx, zy ( 왼쪽아래 )
+//        zx, zy ( 오른쪽아래 )
+        
+//        (rx, ry) -1-2-3-4-5-> (zx, ry)
+//            |                   |
+//            1                   1
+//            |                   |
+//            2                   2
+//            |                   |
+//            3                   3
+//            |                   |
+//            4                   4
+//            |                   |
+//        (rx, zy) -1-2-3-4-5-> (zx, zy)
+        
+        
+        
+        location.append(currentlocation)
+    }
     func point(onCircleWith center: CGPoint, radius: CGFloat, degree: Double) -> CGPoint {
         let nDegree = degree > 360 ? degree - 360 : degree
         let rad = nDegree * .pi / 180

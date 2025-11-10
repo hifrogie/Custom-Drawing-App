@@ -10,7 +10,8 @@ import SwiftUI
 struct ContentView: View {
     var body: some View {
         VStack {
-            MemoView()
+//            MemoView()
+            NewMemoView()
                 .frame(width:.infinity, height: .infinity)
 //            DrawView()
         }.background(Color.red)

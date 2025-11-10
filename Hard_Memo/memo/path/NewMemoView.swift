@@ -77,7 +77,8 @@ struct NewMemoView: View {
                             currentlocation = []
                         } else if mode == 2 {
                             shapeLocation.append(value.location)
-                            makeCircle()
+//                            makeCircle()
+                            makeSquare()
                             shapeLocation = []
                             currentlocation = []
                         } else if mode == 3 {
@@ -183,36 +184,42 @@ struct NewMemoView: View {
         let zx = lastPoint.x
         let zy = lastPoint.y
         
-        let leftTop = CGPoint(x: rx, y: ry)
-        let rightTop = CGPoint(x: zx, y: zy)
-        let leftBottom = CGPoint(x: rx, y: ry)
-        let rightBottom = CGPoint(x: zx, y: zy)
+        let divNum = 10
+        let partX = (zx - rx) / CGFloat(divNum)
+        let partY = (zy - ry) / CGFloat(divNum)
         
-        var topX = (rx - zx)/5
-        topX = rx + topX
-        var topXArray : [CGPoint] = []
-        topXArray.append(CGPoint(x: topX, y: ry))
-        topX = rx + topX + topX
-        topXArray.append(CGPoint(x: topX, y: ry))
-        topX = rx + topX + topX + topX
-        topXArray.append(CGPoint(x: topX, y: ry))
-        topX = rx + topX + topX + topX + topX
-        topXArray.append(CGPoint(x: topX, y: ry))
-        topX = rx + topX + topX + topX + topX + topX
-        topXArray.append(CGPoint(x: topX, y: ry))
+        for i in 0...divNum {
+            let topX = rx + (partX * CGFloat(i))
+            currentlocation.append(CGPoint(x: topX, y: ry))
+        }
         
-        var bottomX = (rx - zx)/5
-        topX = rx + topX
-        var bottomXArray : [CGPoint] = []
-        bottomXArray.append(CGPoint(x: bottomX, y: zy))
-        bottomX = rx + bottomX + bottomX
-        bottomXArray.append(CGPoint(x: bottomX, y: zy))
-        bottomX = rx + bottomX + bottomX + bottomX
-        bottomXArray.append(CGPoint(x: bottomX, y: zy))
-        bottomX = rx + bottomX + bottomX + bottomX + bottomX
-        bottomXArray.append(CGPoint(x: bottomX, y: zy))
-        bottomX = rx + bottomX + bottomX + bottomX + bottomX + bottomX
-        bottomXArray.append(CGPoint(x: bottomX, y: zy))
+        for i in 0...divNum {
+            let leftY = ry + (partY * CGFloat(i))
+            currentlocation.append(CGPoint(x: zx, y: leftY))
+        }
+        
+        for i in 0...divNum {
+            let bottomX = zx - (partX * CGFloat(i))
+            currentlocation.append(CGPoint(x: bottomX, y: zy))
+        }
+        
+        for i in 0...divNum {
+            let leftY = zy - (partY * CGFloat(i))
+            currentlocation.append(CGPoint(x: rx, y: leftY))
+        }
+        
+//        var bottomX = (rx - zx)/5
+//        bottomX = rx + bottomX
+//        var bottomXArray : [CGPoint] = []
+//        bottomXArray.append(CGPoint(x: bottomX, y: zy))
+//        bottomX = rx + bottomX + bottomX
+//        bottomXArray.append(CGPoint(x: bottomX, y: zy))
+//        bottomX = rx + bottomX + bottomX + bottomX
+//        bottomXArray.append(CGPoint(x: bottomX, y: zy))
+//        bottomX = rx + bottomX + bottomX + bottomX + bottomX
+//        bottomXArray.append(CGPoint(x: bottomX, y: zy))
+//        bottomX = rx + bottomX + bottomX + bottomX + bottomX + bottomX
+//        bottomXArray.append(CGPoint(x: bottomX, y: zy))
         
 //        var topline = leftTop - rightTop
         

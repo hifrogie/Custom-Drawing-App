@@ -11,10 +11,11 @@ struct ContentView: View {
     var body: some View {
         VStack {
 //            MemoView()
-            NewMemoView()
+//            NewMemoView()
+            ChartView()
                 .frame(width:.infinity, height: .infinity)
 //            DrawView()
-        }.background(Color.red)
+        }
     }
 }
 

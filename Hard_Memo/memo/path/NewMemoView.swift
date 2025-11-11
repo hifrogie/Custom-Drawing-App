@@ -178,7 +178,7 @@ struct NewMemoView: View {
     func makeSquare() {
         let startPoint = shapeLocation[0]
         let lastPoint = shapeLocation.last ?? .zero
-        let midPoint = CGPoint(x: (startPoint.x + lastPoint.x) / 2, y: (startPoint.y + lastPoint.y) / 2)
+        
         let rx = startPoint.x
         let ry = startPoint.y
         let zx = lastPoint.x
@@ -207,40 +207,6 @@ struct NewMemoView: View {
             let leftY = zy - (partY * CGFloat(i))
             currentlocation.append(CGPoint(x: rx, y: leftY))
         }
-        
-//        var bottomX = (rx - zx)/5
-//        bottomX = rx + bottomX
-//        var bottomXArray : [CGPoint] = []
-//        bottomXArray.append(CGPoint(x: bottomX, y: zy))
-//        bottomX = rx + bottomX + bottomX
-//        bottomXArray.append(CGPoint(x: bottomX, y: zy))
-//        bottomX = rx + bottomX + bottomX + bottomX
-//        bottomXArray.append(CGPoint(x: bottomX, y: zy))
-//        bottomX = rx + bottomX + bottomX + bottomX + bottomX
-//        bottomXArray.append(CGPoint(x: bottomX, y: zy))
-//        bottomX = rx + bottomX + bottomX + bottomX + bottomX + bottomX
-//        bottomXArray.append(CGPoint(x: bottomX, y: zy))
-        
-//        var topline = leftTop - rightTop
-        
-//        rx, ry ( 왼쪽위 )
-//        zx, ry ( 오른쪽위 )
-//        rx, zy ( 왼쪽아래 )
-//        zx, zy ( 오른쪽아래 )
-        
-//        (rx, ry) -1-2-3-4-5-> (zx, ry)
-//            |                   |
-//            1                   1
-//            |                   |
-//            2                   2
-//            |                   |
-//            3                   3
-//            |                   |
-//            4                   4
-//            |                   |
-//        (rx, zy) -1-2-3-4-5-> (zx, zy)
-        
-        
         
         location.append(currentlocation)
     }

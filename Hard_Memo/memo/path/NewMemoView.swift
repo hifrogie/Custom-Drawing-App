@@ -77,8 +77,10 @@ struct NewMemoView: View {
                             currentlocation = []
                         } else if mode == 2 {
                             shapeLocation.append(value.location)
-//                            makeCircle()
-                            makeSquare()
+                            switch shpaeType {
+                            case .circle: makeCircle()
+                            case .rectangle: makeSquare()
+                            }
                             shapeLocation = []
                             currentlocation = []
                         } else if mode == 3 {
@@ -132,15 +134,6 @@ struct NewMemoView: View {
                 }
             }
         }
-    }
-    
-    func makeRect() {
-        let startPoint = shapeLocation[0]
-        let lastPoint = shapeLocation.last ?? .zero
-        let leftBottomP = CGPoint(x: startPoint.x, y: lastPoint.y)
-        let rightTopP = CGPoint(x: lastPoint.x, y: startPoint.y)
-        
-        
     }
     
 //    func makeRowPoints(startPoint:CGPoint, endPoint:CGPoint) -> [CGPoint] {
